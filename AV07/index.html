@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DATEPICKER</title>
+    <!-- <link rel="stylesheet" href="/jquery-ui.css" /> -->
+    <script src="/jquery.js"></script>
+    <script src="/jquery-ui.js"></script>
+    <script type="text/javascript" src="/lib/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="/lib//jquery.jcarousel.js"></script>
+    <link rel="stylesheet" type="text/css" href="/lib/skin.css" />
+
+    <script></script>
+  </head>
+
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      width: 100%;
+    }
+    #wrapper {
+      display: flex;
+      width: 50%;
+      flex-direction: row;
+      justify-content: space-around;
+      background-color: gray;
+      padding: 100px;
+      border-radius: 10px;
+    }
+  </style>
+  <body>
+    <div id="wrapper">
+      <div><label for="">Enter Date</label> <input id="date" /></div>
+
+      <div class="ui-widget">
+        <label for="tags">Tags: </label>
+        <input id="tags" />
+      </div>
+
+      <div id="wrap">
+        <ul id="mycarousel" class="jcarousel-skin-tango">
+          <li>
+            <img src="/Vezbanje/img1.png" width="75" height="75" alt="" />
+          </li>
+          <li>
+            <img src="/Vezbanje/img2.png" width="75" height="75" alt="" />
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+  <script>
+    //Enable datepicker for a input
+    $(document).ready(function () {
+      //Settings for DATEPICKER
+      var pickOpts = {
+        dateFormat: "d MM yy",
+        // appendText: "d MM yy", //Shows text next to the input
+        // changeMonth: true, // Ability to change months
+        // changeYear: true,
+        // duration: "fast", //Animation Speed
+        // showAnim: "fold",
+
+        //Create custom formats
+        clearText: "Brisi",
+        closeText: "Zatvori",
+        currentText: "Tekoven",
+        dayNamesMin: ["Ned", "Pon", "Vto", "Sr", "Cet", "Pet", "Sa"], //Change day names
+        firstDay: 1, //Chose which index is starting day
+        // monthNames: ["Jan", "Feb"] //Change month names
+
+        numberOfMonths: 2,
+        stepMonths: 2,
+      };
+
+      //Settings for AUTOCOMPLETION
+      var availableTags = [
+        "ActionScript",
+        "AppleScript",
+        "Asp",
+        "BASIC",
+        "C",
+        "C++",
+        "Clojure",
+        "COBOL",
+        "ColdFusion",
+        "Erlang",
+        "Fortran",
+        "Groovy",
+        "Haskell",
+        "Java",
+        "JavaScript",
+        "Lisp",
+        "Perl",
+        "PHP",
+        "Python",
+        "Ruby",
+        "Scala",
+        "Scheme",
+      ];
+
+      $("#date").datepicker(pickOpts);
+
+      //Settings default date
+      //   $("#date").datepicker();
+      //   $("#date").datepicker("setDate", "10/12/2022");
+
+      $("#tags").autocomplete({
+        source: availableTags,
+      });
+    });
+
+    jQuery(document).ready(function () {
+      jQuery("#mycarousel").jcarousel();
+    });
+  </script>
+</html>

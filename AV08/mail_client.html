@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DATEPICKER</title>
+    <link rel="stylesheet" href="/jquery-ui.css" />
+    <script src="/jquery.js"></script>
+    <script src="/jquery-ui.js"></script>
+  </head>
+
+  <style></style>
+
+  <script>
+    $(document).ready(function () {
+      // 1. Hover Effect
+      // Adds a visual cue when moving mouse over rows
+      $("tr").hover(
+        function () {
+          $(this).addClass("tr-hover");
+        },
+        function () {
+          $(this).removeClass("tr-hover");
+        }
+      );
+
+      $("input[type=checkbox]").click(function () {
+        var rowId = $(this).attr("value");
+
+        if ($(this).is(":checked")) {
+          $("#" + rowId).addClass("row-selected");
+        } else {
+          $("#" + rowId).removeClass("row-selected");
+        }
+      });
+
+      // 3. Delete Logic
+      $("#delete").click(function () {
+        if ($(".row-selected").length == 0) {
+          alert("No mails selected");
+        } else {
+          // We don't actually delete data, we just hide the rows
+          $(".row-selected").hide();
+
+          // Optional: Uncheck the boxes so they aren't checked if restored
+          $(".row-selected")
+            .find("input[type=checkbox]")
+            .prop("checked", false);
+        }
+      });
+
+      // 4. Restore Logic
+      // In this simple example, we just show everything that was hidden
+      $("#restore").click(function () {
+        $(".row-selected").show();
+        $(".row-selected").removeClass("row-selected");
+      });
+    });
+  </script>
+  <body>
+    <input type="button" value="delete" id="delete" />
+    <input type="button" value="restore" id="restore" />
+    <table cellspacing="0">
+      <tr id="0">
+        <td><input type="checkbox" value="0" /></td>
+        <td>Sender 1</td>
+        <td>Subject 2</td>
+      </tr>
+      <tr id="1">
+        <td><input type="checkbox" value="1" /></td>
+        <td>Sender 2</td>
+        <td>Subject 2</td>
+      </tr>
+      <tr id="2">
+        <td><input type="checkbox" value="2" /></td>
+        <td>Sender 3</td>
+        <td>Subject 3</td>
+      </tr>
+      <tr id="3">
+        <td><input type="checkbox" value="3" /></td>
+        <td>Sender 4</td>
+        <td>Subject 4</td>
+      </tr>
+      <tr id="4">
+        <td><input type="checkbox" value="4" /></td>
+        <td>Sender 5</td>
+        <td>Subject 5</td>
+      </tr>
+      <tr id="5">
+        <td><input type="checkbox" value="5" /></td>
+        <td>Sender 6</td>
+        <td>Subject 6</td>
+      </tr>
+      <tr id="6">
+        <td><input type="checkbox" value="6" /></td>
+        <td>Sender 7</td>
+        <td>Subject 7</td>
+      </tr>
+    </table>
+  </body>
+</html>

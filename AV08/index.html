@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DATEPICKER</title>
+    <link rel="stylesheet" href="/jquery-ui.css" />
+    <script src="/jquery.js"></script>
+    <script src="/jquery-ui.js"></script>
+  </head>
+
+<style>
+    /* CSS from Image 2: Styling the Category Headers */
+    .ui-autocomplete-category {
+      font-weight: bold;
+      padding: .2em .4em;
+      margin: .8em 0 .2em;
+      line-height: 1.5;
+      color: #333; /* Added for visibility */
+      background-color: #f0f0f0; /* Added so you can see the header clearly */
+    }
+
+    label{
+        display: inline-block;
+        width: 100px;
+        margin: 5px;
+    }
+    input{
+        width: 200px;
+    }
+    #progressbar{
+        display:inline-block;
+        width: 200px;
+        height: 10px;
+    }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+  <script>
+  $( function() {
+    
+    // --- STEP 1: Define the Custom Widget (From Image 1) ---
+    // We extend the default ui.autocomplete to create "custom.catcomplete"
+    $.widget( "custom.catcomplete", $.ui.autocomplete, {
+      _create: function() {
+        this._super();
+        this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+      },
+      _renderMenu: function( ul, items ) {
+        var that = this;
+        var currentCategory = "";
+        
+        // Loop through all items found
+        $.each( items, function( index, item ) {
+          var li;
+          
+          // If the category changes, insert a header <li>
+          if ( item.category != currentCategory ) {
+            ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+            currentCategory = item.category;
+          }
+          
+          // Render the actual item
+          li = that._renderItemData( ul, item );
+          
+          if ( item.category ) {
+            li.attr( "aria-label", item.category + " : " + item.label );
+          }
+        });
+      }
+    });
+
+    // --- STEP 2: The Data (From Image 2) ---
+    var data = [
+      { label: "anders", category: "" },
+      { label: "andreas", category: "" },
+      { label: "antal", category: "" },
+      { label: "annhhx10", category: "Products" },
+      { label: "annk K12", category: "Products" },
+      { label: "annttop C13", category: "Products" },
+      { label: "anders andersson", category: "People" },
+      { label: "andreas andersson", category: "People" },
+      { label: "andreas johnson", category: "People" }
+    ];
+
+    // --- STEP 3: Initialize the Widget (From Image 2) ---
+    $( "#search" ).catcomplete({
+      delay: 0,
+      source: data
+    });
+
+
+    //PROGRESSBAR
+    $("#progressbar").progressbar({
+        value: 0
+    });
+
+    // We only need to find this selector ONCE after initialization
+    var progressbarValue = $("#progressbar").find(".ui-progressbar-value");
+
+    // Initialize default color
+    progressbarValue.css({
+        "background": "red"
+    });
+
+    // FIX 1: Target the ID specifically (or change your HTML input to type="password")
+    // FIX 2: Use 'keyup' so it captures the latest character typed
+    $('#password').on("keyup", function() {
+        var currentPassword = $(this).val();
+        var score = calculateStrength(currentPassword);
+
+        // FIX 3: Fixed typo "backround" -> "background"
+        if (score <= 1) {
+            progressbarValue.css({
+                "background": "red"
+            });
+        } else if (score == 2) {
+            progressbarValue.css({
+                "background": "yellow"
+            });
+        } else if (score == 3) {
+            progressbarValue.css({
+                "background": "green"
+            });
+        }
+
+        // Update the bar value
+        $("#progressbar").progressbar("value", score * 33);
+    });
+
+    function calculateStrength(password) {
+        var result = 0;
+        // Check for letters
+        result += /[a-zA-Z]+/.test(password) ? 1 : 0;
+        // Check for numbers
+        result += /[0-9]+/.test(password) ? 1 : 0;
+        
+        var specialCharacters = "<>@!$%^&*()_+{}?:;|";
+        var check = function(string) {
+            for (i = 0; i < specialCharacters.length; i++) {
+                if (string.indexOf(specialCharacters[i]) > -1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        // Check for special chars
+        result += check(password) ? 1 : 0;
+        
+        return result;
+    }
+
+  });
+  </script>
+</head>
+<body>
+ 
+
+<div>
+     <!-- PlaceHolder Implemenation-->
+<label for="search">Search: </label>
+<input id="search">
+</div>
+
+<div>
+    <form>
+        <legend>Sample info:</legend>
+        <label> First name: </label>
+        <input type="text" id = "password" placeholder="Enter Password">
+    </form>
+    <div id="progressbar"></div>
+</div>
+
+ 
+</body>
+</html>

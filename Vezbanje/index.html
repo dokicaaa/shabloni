@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Modal Form with Table</title>
+    <link rel="stylesheet" href="jquery-ui.css" />
+    <script src="jquery.js"></script>
+    <script src="jquery-ui.js"></script>
+
+    <style>
+      body {
+        font-family: "Trebuchet MS", sans-serif;
+        font-size: 14px;
+        /* This creates the diagonal gray stripes background from the image */
+        background: repeating-linear-gradient(
+          45deg,
+          #d0d0d0,
+          #d0d0d0 10px,
+          #e0e0e0 10px,
+          #e0e0e0 20px
+        );
+        height: 100vh;
+        padding: 20px;
+      }
+
+      /* --- Table Styling --- */
+      table {
+        width: 600px;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.5); /* Semi-transparent white */
+      }
+      td,
+      th {
+        padding: 10px;
+        border: 1px solid #aaa;
+        text-align: left;
+      }
+      /* Mimic the orange/brown header from the image */
+      thead tr {
+        background: #d4a358;
+        color: white;
+      }
+
+      /* --- Form Styling inside Modal --- */
+      label,
+      input {
+        display: block;
+      }
+      input.text {
+        margin-bottom: 12px;
+        width: 95%;
+        padding: 0.4em;
+      }
+      fieldset {
+        padding: 0;
+        border: 0;
+        margin-top: 25px;
+      }
+
+      /* Override jQuery UI Dialog Titlebar to match image (Orange) */
+      .ui-dialog .ui-dialog-titlebar {
+        background: #f6a828;
+        color: #ffffff;
+        border: 1px solid #e78f08;
+      }
+    </style>
+
+    <script>
+      $(function () {
+        $("#progressbar").progressbar({
+          value: 39,
+        });
+
+        // References to the form fields
+        var name = $("#name"),
+          email = $("#email"),
+          password = $("#password"),
+          allFields = $([]).add(name).add(email).add(password);
+
+        $("#dialog-form").dialog({
+          autoOpen: false,
+          height: 400,
+          width: 350,
+          modal: true,
+          buttons: {
+            "Create an account": function () {
+              // 1. VALIDATION (Simple check)
+              // Check if variables are not empty
+              if (name.val() && email.val() && password.val()) {
+                // 2. ADD TO TABLE
+                // We append a table row (tr) with table data cells (td)
+                $("#users tbody").append(
+                  "<tr>" +
+                    "<td>" +
+                    name.val() +
+                    "</td>" +
+                    "<td>" +
+                    email.val() +
+                    "</td>" +
+                    "<td>" +
+                    password.val() +
+                    "</td>" +
+                    "</tr>"
+                );
+
+                // 3. CLOSE DIALOG
+                $(this).dialog("close");
+              } else {
+                alert("All form fields are required.");
+              }
+            },
+            Cancel: function () {
+              $(this).dialog("close");
+            },
+          },
+          close: function () {
+            // Clear inputs and remove error highlighting on close
+            allFields.val("").removeClass("ui-state-error");
+          },
+        });
+
+        $("#create-user")
+          .button()
+          .click(function () {
+            $("#dialog-form").dialog("open");
+          });
+      });
+    </script>
+  </head>
+  <body>
+    <h2>Existing Users:</h2>
+
+    <div id="users-contain" class="ui-widget">
+      <table id="users" class="ui-widget ui-widget-content">
+        <thead>
+          <tr class="ui-widget-header">
+            <th>Name</th>
+            <th>Email</th>
+            <th>Password</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Finki Finkievski</td>
+            <td>finki.finkievski@finki.ukim.mk</td>
+            <td>finki123</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button id="create-user">Create new user</button>
+
+    <div id="dialog-form" title="Create new user">
+      <p class="validateTips">All form fields are required.</p>
+      <form>
+        <fieldset>
+          <label for="name">Name</label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            class="text ui-widget-content ui-corner-all"
+          />
+
+          <label for="email">Email</label>
+          <input
+            type="text"
+            name="email"
+            id="email"
+            class="text ui-widget-content ui-corner-all"
+          />
+
+          <label for="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            class="text ui-widget-content ui-corner-all"
+          />
+
+          <input
+            type="submit"
+            tabindex="-1"
+            style="position: absolute; top: -1000px"
+          />
+        </fieldset>
+      </form>
+    </div>
+    <div id="progressbar"></div>
+  </body>
+</html>
