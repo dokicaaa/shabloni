@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Fixed</title>
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+    <style>
+      span.error {
+        color: red;
+        display: none; /* Hidden by default */
+        font-weight: bold;
+      }
+      #wrapper {
+        display: flex;
+        flex-direction: row;
+      }
+      #slider {
+        height: 20px;
+        width: 250px;
+        border: 1px solid black;
+        margin: 10px;
+        float: left;
+        background-color: #eee;
+      }
+      #value {
+        height: 100%;
+        width: 0%;
+        background-color: aqua;
+        transition: width 0.3s;
+      }
+      button {
+        float: left;
+        margin: 10px;
+      }
+    </style>
+
+    <script>
+      $(document).ready(function () {
+        // 2. Added 'e' parameter here so preventDefault works
+        $("button").click(function (e) {
+          e.preventDefault();
+          updateProgress();
+
+          if (validate()) {
+            alert("You have been registered!");
+          } else {
+            alert("You have not filled all the mandatory fields");
+          }
+        });
+
+        function validate() {
+          var valid = true;
+
+          $("#general input, #personal input[type=date]").each(function (
+            index,
+            item
+          ) {
+            // 3. Fixed .trim() syntax
+            if ($(item).val().trim() === "") {
+              $(item).next(".error").show();
+              valid = false;
+            } else {
+              $(item).next(".error").hide();
+            }
+          });
+
+          // 4. Fixed Selector Syntax (Removed the extra =)
+          var $p1 = $("input[type='password']").eq(0);
+          var $p2 = $("input[type='password']").eq(1);
+
+          if ($p1.val() !== "" && $p1.val() !== $p2.val()) {
+            alert("Passwords do not match");
+            valid = false;
+          }
+
+          // 5. Vital: Return the result!
+          return valid;
+        }
+
+        function updateProgress() {
+          var num = 0;
+          $("#general input, #personal input").each(function (index, item) {
+            if (
+              ($(item).attr("type") == "text" ||
+                $(item).attr("type") == "password" ||
+                $(item).attr("type") == "date") &&
+              $(item).val().trim() !== ""
+            ) {
+              num += 1;
+            }
+          });
+
+          var num2 = $("#personal input[type='radio']:checked").length;
+          var num3 = $("#movie input:checked").length > 0 ? 1 : 0;
+
+          var total_fields = 9;
+          var current_score = num + num2 + num3;
+
+          var percent = (current_score / total_fields) * 100;
+
+          if (percent > 100) percent = 100;
+
+          $("#value").css("width", percent + "%");
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <form>
+      <fieldset id="general">
+        <legend>General info:</legend>
+        <label>Username: </label> <input type="text" />
+        <span class="error">*</span> <br />
+        <label>Email: </label> <input type="text" />
+        <span class="error">*</span> <br />
+        <label>Password: </label> <input type="password" />
+        <span class="error">*</span> <br />
+        <label>Confirm: </label> <input type="password" />
+        <span class="error">*</span>
+      </fieldset>
+
+      <fieldset id="personal">
+        <legend>Personal info:</legend>
+        <label>First name: </label> <input type="text" /><br />
+        <label>Last name: </label> <input type="text" /><br />
+        <label>Date of birth: </label> <input type="date" />
+        <span class="error">*</span> <br />
+
+        <label>Gender: </label>
+        <input type="radio" name="gender" id="male" value="male" /> male
+        <input type="radio" name="gender" id="female" value="female" /> female
+      </fieldset>
+
+      <fieldset id="movie">
+        <legend>Movie category info:</legend>
+        <input type="checkbox" name="category" value="Action" /> Action <br />
+        <input type="checkbox" name="category" value="Animation" /> Animation
+        <br />
+        <input type="checkbox" name="category" value="Comedy" /> Comedy <br />
+        <input type="checkbox" name="category" value="Crime" /> Crime <br />
+        <input type="checkbox" name="category" value="Drama" /> Drama <br />
+        <input type="checkbox" name="category" value="Fantasy" /> Fantasy <br />
+        <input type="checkbox" name="category" value="Musical" /> Musical <br />
+        <input type="checkbox" name="category" value="Romance" /> Romance <br />
+        <input type="checkbox" name="category" value="Horror" /> Horror <br />
+        <input type="checkbox" name="category" value="Sci-Fi" /> Sci-Fi <br />
+        <input type="checkbox" name="category" value="Thriller" />Thriller
+        <br />
+      </fieldset>
+
+      <button id="register">Register</button>
+      <div id="slider"><div id="value"></div></div>
+    </form>
+  </body>
+</html>

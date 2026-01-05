@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/vader/jquery-ui.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
+    <title>F1 Drivers</title>
+  </head>
+  <style>
+    body {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .container {
+      width: 200px;
+      padding: 20px;
+      margin: 20px;
+      background-color: rgb(161, 161, 161);
+      border: 1px solid black;
+      border-radius: 12px;
+    }
+    #details {
+      display: none;
+      width: 200px;
+      height: 80px;
+      padding: 20px;
+      margin: 20px;
+      background-color: rgb(161, 161, 161);
+      border: 1px solid black;
+      border-radius: 12px;
+    }
+  </style>
+  <body>
+    <div class="container">
+      <h3>2016 Drivers</h3>
+      <ul id="list-first" class="connectedSortable"></ul>
+    </div>
+    <div class="container">
+      <h3>2016 Drivers</h3>
+      <ul id="list-second" class="connectedSortable"></ul>
+    </div>
+
+    <div class="container">
+      <h3>Drag your favorutes drivers</h3>
+      <ul id="list-favoruites" class="connectedSortable">
+        <li>Drop your fav drivers</li>
+      </ul>
+    </div>
+
+    <div id="details">
+      <strong>Name:</strong> <span id="name"></span> <br />
+      <strong>Nationality:</strong> <span id="nationality"></span> <br />
+      <strong>Date of Birth:</strong> <span id="date"></span> <br />
+      <a id="link" href="" target="_blank">Link</a>
+    </div>
+    <script>
+      $(document).ready(function () {
+        //DRAG AND DROP
+        $(".connectedSortable")
+          .sortable({
+            connectWith: ".connectedSortable",
+            cursor: "moove",
+            placeholder: "ui-sortable-placeholder",
+          })
+          .disableSelection();
+
+        loadDrivers("2016", "#list-first");
+        loadDrivers("2017", "#list-second");
+
+        function loadDrivers(year, elementID) {
+          $.ajax({
+            url: "https://api.jolpi.ca/ergast/f1/" + year + "/drivers.json",
+            dataType: "json",
+            success: function (data) {
+              var driversArray = data.MRData.DriverTable.Drivers;
+
+              var count = 1;
+
+              $.each(driversArray, function (index, driver) {
+                var fullName =
+                  count + ". " + driver.givenName + " " + driver.familyName;
+
+                var $listItem = $("<li>").text(fullName);
+
+                $listItem.data("driversData", driver);
+
+                $(elementID).append($listItem);
+
+                count++;
+              });
+            },
+            error: function () {
+              alert("Failed to load data for " + year);
+            },
+          });
+        }
+
+        //CLICK ON DRIVER FOR MORE DETAILS
+        $(document).on("click", "#list-favoruites li", function () {
+          var driver = $(this).data("driversData");
+
+          var fullName = driver.givenName + " " + driver.familyName;
+          $("#name").text(fullName);
+          $("#nationality").text(driver.nationality);
+          $("#date").text(driver.dateOfBirth);
+          $("#link").attr("href", driver.url);
+          $("#details").show();
+        });
+      });
+    </script>
+  </body>
+</html>

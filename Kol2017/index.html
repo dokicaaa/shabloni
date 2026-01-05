@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/vader/jquery-ui.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
+    <title>Book Lookup</title>
+  </head>
+  <style>
+    #main {
+      width: 400px;
+    }
+    #isbn-input {
+      margin: 5px;
+      border-radius: 1px solid black;
+    }
+    #details {
+      border: 1px solid black;
+      padding: 10px;
+      margin-left: 30px;
+      display: none;
+    }
+    #wrapper {
+      display: flex;
+      flex-direction: row;
+    }
+    #social-media {
+      margin-top: 200px;
+    }
+  </style>
+
+  <body>
+    <fieldset id="main">
+      <label>ISBN</label>
+      <input
+        type="text"
+        name="isbn"
+        id="isbn-input"
+        placeholder="Enter 10 or 13 digit number"
+      />
+      <button id="add">Add Book</button>
+    </fieldset>
+
+    <div id="wrapper">
+      <ul id="books"></ul>
+
+      <div id="details">
+        <h3 id="title"></h3>
+        <img id="display-img" src="" style="max-width: 150px" /><br />
+        <strong>Publisher: </strong> <span id="publisher"></span>
+        <strong>ISBN 13: </strong> <span id="isbn_13"></span>
+      </div>
+    </div>
+
+    <div id="social-media">
+      <a href="http://twitter.com/"
+        ><img src="images/twitter.png" height="48" width="48"
+      /></a>
+      <a href="http://www.reddit.com/"
+        ><img src="images/reddit.png" height="48" width="48"
+      /></a>
+      <a href="http://www.linkedin.com/"
+        ><img src="images/linkedin.png" height="48" width="48"
+      /></a>
+      <a href="http://www.flickr.com/"
+        ><img src="images/flickr.png" height="48" width="48"
+      /></a>
+      <a href="http://www.facebook.com/"
+        ><img src="images/facebook.png" height="48" width="48"
+      /></a>
+      <a href="http://digg.com/"
+        ><img src="images/digg.png" height="48" width="48"
+      /></a>
+      <a href="http://www.delicious.com/"
+        ><img src="images/delicious.png" height="48" width="48"
+      /></a>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        //Process API when add clicked
+        $("#add").click(function () {
+          //Get the value
+          var isbn = $("#isbn-input").val().trim();
+
+          if (isbn === "") {
+            alert("Isbn field is empty!");
+          }
+
+          $.ajax({
+            url:
+              "https://openlibrary.org/api/books?bibkeys=ISBN:" +
+              isbn +
+              "&jscmd=details&callback=mycallback",
+            dataType: "jsonp",
+            success: function (data) {
+              var book = data["ISBN:" + isbn];
+
+              if (book) {
+                //Crate new li element
+                var $newItem = $("<li>").text(book.details.title);
+
+                //Atach book object to element
+                $newItem.data("bookInfo", book);
+
+                $("#books").append($newItem);
+              } else {
+                alert("Book not found!");
+              }
+            },
+          });
+        });
+
+        //CLICK LIST ITEM FOR DETAILED VIEWS
+        $(document).on("click", "#books li", function () {
+          //Retrieve whole object
+          var book = $(this).data("bookInfo");
+
+          $("#title").text(book.details.title);
+          $("#display-img").attr("src", book.thumbnail_url);
+
+          if (book.details.publishers) {
+            $("#publisher").text(book.details.publishers[0]);
+          }
+          if (book.details.isbn_13) {
+            $("#isbn_13").text(book.details.isbn_13[0]);
+          }
+
+          $("#details").show();
+        });
+      });
+    </script>
+  </body>
+</html>
