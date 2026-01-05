@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/vader/jquery-ui.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
+    <title>Comics</title>
+  </head>
+  <style>
+    #category-panel {
+      width: min-content;
+      align-items: center;
+    }
+    li {
+      list-style-type: none;
+    }
+    #category-panel li {
+      border: 1px solid gray;
+      width: 200px;
+      margin: 5px;
+      padding: 20px;
+      margin-right: 60px;
+      border-radius: 12px;
+    }
+
+    body {
+      display: inline-flex;
+    }
+
+    #details-list {
+      border: 1px solid black;
+      border-radius: 12px;
+      padding: 10px;
+      width: 300px;
+      margin-left: 50px;
+      display: none;
+    }
+
+    .wrapper {
+      border: 1px solid black;
+      border-radius: 12px;
+      padding: 10px;
+      width: 300px;
+    }
+    #prodImage {
+      width: 50px;
+    }
+
+    /* MORA DISPLAY NONE */
+    .prod-details {
+      display: none;
+      padding: 15px;
+      background-color: #a3a3a3;
+      border-top: 1px dashed #ccc;
+      border-radius: 12px;
+    }
+  </style>
+  <body>
+    <div>
+      <h3>Select category:</h3>
+      <ul id="category-panel">
+        <li data-cat="smartphones">Smartphones</li>
+        <li data-cat="laptops">Laptops</li>
+        <li data-cat="fragrances">Fragrances</li>
+        <li data-cat="beauty">Beauty</li>
+      </ul>
+    </div>
+
+    <div class="wrapper">
+      <h3>Available products:</h3>
+      <ul id="products-list"></ul>
+    </div>
+
+    <div id="details-list">
+      <h3>Products Details:</h3>
+      <strong>Brand: </strong> <span id="brand"></span><br />
+      <strong>Price: </strong> <span id="price"></span><br />
+      <strong>Rating: </strong> <span id="rating"></span><br />
+      <img id="prodImage" src="" />
+    </div>
+  </body>
+  <script>
+    $(document).ready(function () {
+      function loadProducts(category) {
+        $("#products-list").empty();
+        $.ajax({
+          url: "https://dummyjson.com/products/category/" + category,
+          dataType: "json",
+          success: function (data) {
+            $.each(data.products, function (index, product) {
+              var $product = $("<li>").addClass("prod-item");
+
+              //CREAIRASH HEADER CLASA
+              var $header = $("<div>").addClass("prod-header");
+              var $title = $("<span>").text(product.title);
+              var $price = $("<span>").addClass("price").text(product.price);
+
+              //APPENDNUVSH DETALI VO HEADER
+              $header.append($title, " $", $price);
+
+              var $details = $("<div>").addClass("prod-details");
+
+              $details.html(
+                "<strong>Brand: </strong>" +
+                  product.brand +
+                  "<br>" +
+                  "<strong>Price: </strong>" +
+                  product.price +
+                  "<br>" +
+                  "<strong>Rating: </strong>" +
+                  product.rating +
+                  "<br>" +
+                  "<img src=" +
+                  product.thumbnail +
+                  " />"
+              );
+
+              $product.append($header, $details);
+
+              $product.data("productData", product);
+
+              $("#products-list").append($product);
+            });
+          },
+        });
+      }
+      $("#category-panel li").click(function () {
+        var category = $(this).data("cat");
+        loadProducts(category);
+      });
+
+      $("#products-list").on("click", ".prod-header", function () {
+        $(this).next(".prod-details").slideToggle();
+      });
+    });
+  </script>
+</html>
