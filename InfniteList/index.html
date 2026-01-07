@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/vader/jquery-ui.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
+    <title>Infinte List</title>
+  </head>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      flex-direction: row;
+    }
+    ul {
+      margin: 0px;
+      display: inline;
+    }
+    li {
+      list-style-type: none;
+      padding: 10px;
+      margin-bottom: 5px;
+      max-width: 300px;
+      border: 1px solid black;
+      border-radius: 12px;
+    }
+    .tags-panel {
+      margin-right: 50px;
+    }
+
+    .title {
+      font-weight: bold;
+    }
+    #news-container {
+      margin-left: 50px;
+    }
+  </style>
+  <body>
+    <div id="tags-panel">
+      <h3>News Categories</h3>
+      <ul id="tags-list">
+        <li data-tag="history">History</li>
+        <li data-tag="crime">Crime</li>
+        <li data-tag="mystery">Mystery</li>
+        <li data-tag="american">American</li>
+      </ul>
+    </div>
+
+    <div id="news-container">
+      <h3>Latest news</h3>
+      <ul id="news-list"></ul>
+    </div>
+  </body>
+  <script>
+    $(document).ready(function () {
+      var limit = 5;
+      var skip = 0;
+      var currCategory = "";
+
+      var isLoading = false;
+
+      function fetchNews(isNewCategory) {
+        if (isLoading) return;
+        isLoading = true;
+
+        if (isNewCategory) {
+          $("#news-list").empty();
+          skip = 0;
+        }
+
+        $.ajax({
+          url:
+            "https://dummyjson.com/posts/tag/" +
+            currCategory +
+            "?limit=" +
+            limit +
+            "&skip=" +
+            skip,
+          dataType: "json",
+          success: function (data) {
+            $.each(data.posts, function (index, post) {
+              var $li = $("<li>").addClass("news-item");
+
+              var $title = $("<div>").addClass("title").text(post.title);
+
+              var $details = $("<div>").addClass("details");
+              $details.html(
+                "<p>" +
+                  post.body +
+                  "</p>" +
+                  "<br>" +
+                  "<small><strong>Tags:</strong> " +
+                  post.tags.join(", ") +
+                  "</small>"
+              );
+
+              $li.append($title, $details);
+              $li.data("newsData", post);
+
+              if (index % 2 !== 0) {
+                $li.css("background-color", "skyblue");
+              } else {
+                $li.css("background-color", "#ffffff");
+              }
+              $("#news-list").append($li);
+            });
+
+            skip += limit;
+            isLoading = false;
+          },
+          error: function () {
+            alert("Failed to get news");
+            isLoading = false;
+          },
+        });
+      }
+      $("#tags-list li").click(function () {
+        $("#tags-list li").removeClass("active");
+        $(this).addClass("active");
+        currCategory = $(this).data("tag");
+        fetchNews(true);
+      });
+
+      $(window).scroll(function () {
+        if (
+          $(window).scrollTop() + $(window).height() >=
+          $(document).height() - 50
+        ) {
+        }
+        if (currCategory != "") {
+          fetchNews(false);
+        }
+      });
+    });
+  </script>
+</html>

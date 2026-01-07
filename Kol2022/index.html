@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/vader/jquery-ui.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
+    <title>Food</title>
+  </head>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: row;
+    }
+    .wrapper {
+      border: 1px solid gray;
+      padding: 30px;
+      width: max-content;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      margin-right: 50px;
+    }
+
+    ul {
+      margin: 0px;
+    }
+    li {
+      list-style-type: none;
+      padding: 10px;
+      margin-bottom: 5px;
+      border: 1px solid black;
+      border-radius: 12px;
+    }
+    .details {
+      display: none;
+      background-color: rgb(187, 187, 187);
+      padding: 10px;
+      border-radius: 12px;
+      width: 250px;
+    }
+
+    .wrapper:nth-child(1) {
+      height: 200px;
+    }
+
+    #socials {
+      margin-top: 50px;
+      float: left;
+      padding: 10px;
+      border: 1px solid gray;
+      border-radius: 12px;
+    }
+  </style>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <h3>Choose cousine:</h3>
+        <ul id="category">
+          <li data-cat="italian">Italian</li>
+          <li data-cat="thai">Thai</li>
+          <li data-cat="asian">Asian</li>
+          <li data-cat="indian">Indian</li>
+        </ul>
+      </div>
+
+      <div class="wrapper">
+        <h3>Available recipes:</h3>
+        <ul id="dish-list"></ul>
+      </div>
+    </div>
+
+    <div id="socials">
+      <h3>Socials:</h3>
+      <a href=""> <img src="/Kol2017/images/delicious.png" alt="" /></a>
+      <a href=""> <img src="/Kol2017/images/facebook.png" alt="" /></a>
+      <a href=""> <img src="/Kol2017/images/twitter.png" alt="" /></a>
+      <a href=""> <img src="/Kol2017/images/flickr.png" alt="" /></a>
+      <a href=""> <img src="/Kol2017/images/linkedin.png" alt="" /></a>
+    </div>
+  </body>
+  <script>
+    $(document).ready(function () {
+      function loadData(category) {
+        //Clear list
+        $("#dish-list").empty();
+
+        //Call api
+        $.ajax({
+          url: "https://dummyjson.com/recipes/tag/" + category,
+          dataType: "json",
+          success: function (data) {
+            $.each(data.recipes, function (index, recipe) {
+              var $li = $("<li>").addClass("dish-item");
+
+              if ($li === "") {
+                alert("Couldnt get recipe list");
+              }
+
+              //Build the visible header
+              var $header = $("<div>").addClass("dish-header");
+              var $dishName = $("<span>").text(recipe.name);
+              var $difficulty = $("<span>")
+                .addClass("diff")
+                .text(recipe.difficulty);
+
+              //Append to header
+              $header.append($dishName, ": ", $difficulty);
+
+              //Build detailed info for each item;
+              var $details = $("<div>").addClass("details");
+
+              $details.html(
+                "<span>Prep Time: </span>" +
+                  recipe.prepTimeMinutes +
+                  "<span>min</span>" +
+                  "<br>" +
+                  "<span>Calories: </span>" +
+                  recipe.caloriesPerServing +
+                  "<br>" +
+                  "<span>Ingredients: </span>" +
+                  "<br>" +
+                  recipe.ingredients +
+                  "<br>"
+              );
+
+              //Append to dish object
+              $li.append($header, $details);
+
+              $li.data("recipeData", recipe);
+
+              //Populate
+              $("#dish-list").append($li);
+            });
+          },
+        });
+      }
+      $("#category li").click(function () {
+        var category = $(this).data("cat");
+        loadData(category);
+      });
+      $(document).on("click", ".dish-header", function () {
+        $(this).next(".details").slideToggle();
+      });
+    });
+  </script>
+</html>
