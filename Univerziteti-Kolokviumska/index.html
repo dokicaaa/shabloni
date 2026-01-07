@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/vader/jquery-ui.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+
+    <title>Univerziteti</title>
+  </head>
+
+  <style>
+    body {
+      display: flex;
+      flex-direction: row;
+    }
+    #wrapper {
+      align-items: center;
+      padding: 10px;
+      background-color: rgb(178, 178, 178);
+      width: 150px;
+      border-radius: 20px;
+      margin-right: 70px;
+      height: 250px;
+    }
+
+    #wrapper:nth-child(2) {
+      align-items: center;
+      padding: 10px;
+      height: max-content;
+      background-color: rgb(178, 178, 178);
+      width: max-content;
+      border-radius: 20px;
+      margin-right: 70px;
+    }
+    #wrapper:nth-child(3) {
+      align-items: center;
+      padding: 10px;
+      background-color: rgb(178, 178, 178);
+      width: 300px;
+      border-radius: 20px;
+      height: max-content;
+      margin-right: 70px;
+    }
+    li {
+      list-style-type: none;
+      padding: 10px;
+      border-radius: 12px;
+      background-color: rgba(250, 255, 174, 0.689);
+      margin-bottom: 10px;
+      width: max-content;
+      text-align: center;
+    }
+    strong {
+      margin-bottom: 20px;
+    }
+    #details-box {
+      display: none;
+      background-color: rgb(178, 178, 178);
+      border-radius: 20px;
+      padding: 20px;
+      width: 300px;
+    }
+
+    button {
+      padding: 10px;
+      border-radius: 12px;
+      background-color: rgb(160, 255, 160);
+      border: none;
+    }
+
+    #progressbar {
+      margin: 10px 0;
+      height: 15px;
+      background-color: white;
+    }
+  </style>
+  <body>
+    <div id="wrapper">
+      <ul id="country-list">
+        <h3>Select country:</h3>
+        <li data-tag="Greece">Greece</li>
+        <li data-tag="Bulgaria">Bulgaria</li>
+        <li data-tag="Serbia">Serbia</li>
+      </ul>
+    </div>
+
+    <div id="wrapper">
+      <h3>Available Universities:</h3>
+      <ul id="uni-list" class="connectedSortable"></ul>
+      <button id="load-uni">Load More..</button>
+    </div>
+
+    <div id="wrapper">
+      <h3>Favourites:</h3>
+      <ul id="fav-list" class="connectedSortable">
+        <li style="width: 100px">Select favorite university:</li>
+      </ul>
+      <div id="progressbar"></div>
+    </div>
+
+    <div id="details-box">
+      <h3>Additional Info:</h3>
+      <strong>Province:</strong> <span id="province"></span> <br /><br />
+      <strong>Website:</strong><a id="link" href=""></a>
+    </div>
+  </body>
+  <script>
+    $(document).ready(function () {
+      //Variables
+      var currCountry = "Greece";
+      var skip = 0;
+      var limit = 5;
+      var favCount = 0;
+
+      fetchUniversities(true);
+      $("#progressbar").progressbar({ value: 0, color: "" });
+
+      //Make the two lists droppable
+      $(".connectedSortable")
+        .sortable({
+          connectWith: ".connectedSortable",
+          receive: function (event, ui) {
+            if (this.id === "fav-list") {
+              //if therese more than 5 alert
+              if (favCount >= 5) {
+                $(ui.sender).sortable("cancel");
+                alert("Не може повеќе од 5!");
+              } else {
+                //Increment
+                favCount++;
+              }
+              //Decrement if not element not in fav list
+            } else {
+              favCount--;
+            }
+
+            //Hide detail if fav count 0
+            if (favCount === 0) {
+              $("#details-box").hide();
+            }
+
+            updateUI();
+          },
+        })
+        .disableSelection();
+
+      //Update the ui every time li is placed inside favourites lsit
+      function updateUI() {
+        var val = (favCount / 5) * 100;
+        $("#progressbar").progressbar("value", val);
+      }
+
+      //Load Data for each element
+      function fetchUniversities(isNewCountry) {
+        //if we choose new country
+        if (isNewCountry) {
+          $("#uni-list").empty();
+          skip = 0;
+        }
+
+        $.ajax({
+          url:
+            "http://universities.hipolabs.com/search?country=" +
+            currCountry +
+            "&limit=" +
+            limit +
+            "&offset=" +
+            skip,
+          dataType: "json",
+          success: function (data) {
+            //Ako imame data show button
+            if (data.length > 0) {
+              $.each(data, function (index, uni) {
+                var $li = $("<li>").text(uni.name).addClass("uni-item");
+                $li.data("uniData", uni);
+                $("#uni-list").append($li);
+              });
+
+              //Show the button
+              $("#load-more").show();
+
+              //Increa
+              skip += limit;
+            } else {
+              //Hide the button if no data
+              $("#load-more").hide();
+            }
+          },
+        });
+      }
+
+      //Click on country to show list
+      $("#country-list li").click(function () {
+        currCountry = $(this).data("tag");
+        fetchUniversities(true);
+      });
+
+      $("#load-uni").click(function () {
+        fetchUniversities(false);
+      });
+
+      //Populate extra details for each uni
+      $("#fav-list").on("click", "li", function () {
+        var uniInfo = $(this).data("uniData");
+
+        var province = uniInfo["state-province"]
+          ? uniInfo["state-province"]
+          : "N/A";
+
+        $("#province").text(province);
+        $("#link")
+          .attr("href", uniInfo.web_pages[0])
+          .text(uniInfo.web_pages[0]);
+        $("#details-box").fadeIn();
+      });
+
+      //ODGOVORI NA
+    });
+  </script>
+</html>
