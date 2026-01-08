@@ -18,6 +18,59 @@
       flex-direction: row;
     }
 
+    .ui-tabs {
+      background: #f4f4f4 !important; /* Light gray background */
+      border: 1px solid #333 !important; /* Dark border */
+      border-radius: 8px !important;
+      padding: 10px !important;
+      width: 350px; /* Set a fixed width if needed */
+    }
+
+    /* 2. The Navigation Bar (Where the buttons sit) */
+    .ui-tabs .ui-tabs-nav {
+      background: #333 !important; /* Dark bar background */
+      border: none !important;
+      padding: 10px 10px 0 10px !important; /* Spacing */
+      border-radius: 8px 8px 0 0 !important;
+    }
+
+    /* 3. The Buttons (Inactive Tabs) */
+    .ui-tabs .ui-tabs-nav li {
+      background: #555 !important; /* Dark gray button */
+      border: 1px solid #222 !important;
+      border-bottom: none !important;
+      margin-right: 5px !important;
+      border-radius: 5px 5px 0 0 !important;
+    }
+
+    /* 4. The Buttons Text */
+    .ui-tabs .ui-tabs-nav li a {
+      color: white !important; /* White text */
+      font-weight: bold;
+    }
+
+    /* 5. The ACTIVE Button (The selected tab) */
+    .ui-tabs .ui-tabs-nav li.ui-state-active {
+      background: #ffcc00 !important; /* Yellow for active */
+      border: 1px solid #c9a000 !important;
+    }
+
+    /* 6. The Active Button Text */
+    .ui-tabs .ui-tabs-nav li.ui-state-active a {
+      color: black !important; /* Black text on yellow */
+    }
+
+    /* 7. The Content Area (Where the lists are) */
+    .ui-tabs .ui-tabs-panel {
+      background: white !important;
+      border: 1px solid #ccc;
+      border-top: none; /* Connects visually to the active tab */
+      padding: 15px !important;
+    }
+
+    ul {
+      color: black;
+    }
     .container {
       width: 200px;
       padding: 20px;
@@ -25,6 +78,9 @@
       background-color: rgb(161, 161, 161);
       border: 1px solid black;
       border-radius: 12px;
+    }
+    a {
+      color: #222;
     }
     #details {
       display: none;
@@ -38,13 +94,21 @@
     }
   </style>
   <body>
-    <div class="container">
-      <h3>2016 Drivers</h3>
-      <ul id="list-first" class="connectedSortable"></ul>
-    </div>
-    <div class="container">
-      <h3>2016 Drivers</h3>
-      <ul id="list-second" class="connectedSortable"></ul>
+    <div id="tabs">
+      <ul>
+        <li><a href="#tabs-1">2016 Drivers</a></li>
+        <li><a href="#tabs-2">2017 Drivers</a></li>
+      </ul>
+
+      <div id="tabs-1">
+        <h3>2016 Drivers</h3>
+        <ul id="list-first" class="connectedSortable"></ul>
+      </div>
+
+      <div id="tabs-2">
+        <h3>2017 Drivers</h3>
+        <ul id="list-second" class="connectedSortable"></ul>
+      </div>
     </div>
 
     <div class="container">
@@ -62,6 +126,7 @@
     </div>
     <script>
       $(document).ready(function () {
+        $("#tabs").tabs();
         //DRAG AND DROP
         $(".connectedSortable")
           .sortable({
