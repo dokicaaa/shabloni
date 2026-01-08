@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Music Planner - API & Buttons</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/vader/jquery-ui.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+  </head>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 50px;
+      background: #222;
+      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .wrapper {
+      padding: 30px;
+      border: 1px solid purple;
+      border-radius: 12px;
+      background-color: #373737;
+      min-width: 300px;
+      min-height: 400px;
+    }
+    ul {
+      padding: 10px;
+      border: 1px solid purple;
+      border-radius: 10px;
+      background-color: #4c4c4c;
+      min-height: 100%;
+    }
+    button {
+      padding: 5px;
+      border-radius: 10px;
+      width: 50px;
+    }
+    #button-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+    li {
+      list-style-type: none;
+      padding: 10px;
+      background-color: purple;
+      border-radius: 10px;
+      margin-bottom: 5px;
+    }
+    #progressbar {
+      height: 15px;
+      background-color: white;
+      border-radius: 10px;
+    }
+    .ui-selected {
+      background-color: lightcoral;
+    }
+  </style>
+  <body>
+    <div class="wrapper">
+      <h3>Search</h3>
+      <input
+        type="text"
+        name=""
+        id="search-input"
+        placeholder="Enter Song Name"
+      />
+      <h3>Songs in Library:</h3>
+      <ul id="left"></ul>
+    </div>
+    <div id="button-wrapper">
+      <button id="right-button">>></button>
+      <button id="left-button"><<</button>
+    </div>
+    <div class="wrapper">
+      <div id="progressbar"></div>
+      <h3>Songs in Playist:</h3>
+      <p>Max Songs:</p>
+      <span></span>
+      <div style="text-align: right; font-size: 0.8em; color: #aaa">
+        Capacity: <span id="count-display">0/5</span>
+      </div>
+      <ul id="right"></ul>
+    </div>
+  </body>
+  <script>
+    $(document).ready(function () {
+      var maxSongs = 5;
+      var currentCountNum = 0;
+
+      $(document).tooltip();
+
+      $("#progressbar").progressbar({
+        value: 0,
+      });
+
+      //Autocompletion
+      var suggestions = [
+        "Bohemian Rhapsody",
+        "Stairway to Heaven",
+        "Hotel California",
+        "Imagine",
+        "Billie Jean",
+      ];
+
+      $("#search-input").autocomplete({
+        source: suggestions,
+      });
+
+      $("#left, #right").selectable({});
+
+      loadMusic();
+      updateUI();
+
+      function loadMusic() {
+        $.ajax({
+          url: "https://itunes.apple.com/search?term=rock&entity=song&limit=10",
+          dataType: "jsonp",
+          success: function (data) {
+            $.each(data.results, function (index, song) {
+              var $li = $("<li>").text(
+                song.trackName + " - " + song.artistName
+              );
+              var details =
+                "Genre" + song.primaryGenreName + " | Price:" + song.trackPrice;
+              $li.attr("title", details);
+
+              $li.data("songData", song);
+              $("#left").append($li);
+            });
+          },
+          error: function () {
+            alert("Neuspesen Api Call");
+          },
+        });
+      }
+
+      //BUTTON RIGHT TO ADD TO NEXT LIST
+      $("#right-button").click(function () {
+        //Select all items with teh class .ui-selected
+        var $selectedItems = $("#left .ui-selected");
+
+        if ($selectedItems.length === 0) {
+          alert("Please select a song first!");
+          return;
+        }
+
+        $selectedItems.each(function () {
+          if (currentCountNum < 5) {
+            var $item = $(this);
+            var $clone = $item.clone().removeClass("ui-selected");
+
+            $clone.data("songData", $item.data("songData"));
+
+            $("#right").append($clone);
+            $item.remove();
+            currentCountNum++;
+          } else {
+            alert("Max Songs Reched in Playlist!");
+          }
+        });
+        updateUI();
+      });
+
+      $("#left-button").click(function () {
+        //Select all items with teh class .ui-selected
+        var $selectedItems = $("#right .ui-selected");
+
+        $selectedItems.each(function () {
+          //BUTTON LEFT TO BRING BACK
+          var $item = $(this);
+          var $clone = $item.clone().removeClass("ui-selected");
+
+          $clone.data("songData", $item.data("songData"));
+
+          $("#left").append($clone);
+          $item.remove();
+          currentCountNum--;
+        });
+        updateUI();
+      });
+
+      function updateUI() {
+        var percent = (currentCountNum / maxSongs) * 100;
+
+        $("#progressbar").progressbar("value", percent);
+        $("#count-display").text(currentCountNum + "/5");
+
+        var $bar = $("#progressbar").find(".ui-progressbar-value");
+        if (percent >= 100) {
+          $bar.css("background", "#cf6679"); // Црвена (Error state)
+        } else {
+          $bar.css("background", "#03dac6"); // Зелена (Teal)
+        }
+      }
+    });
+  </script>
+</html>
